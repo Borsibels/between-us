@@ -17,7 +17,19 @@ export default function AuthPortal({ children }) {
     });
     const { data: listener } = supabase.auth.onAuthStateChange((_event, next) => {
       setSession(next);
-      if (!next) setCouple(null);
+      if (!next) {
+        setCouple(null);
+      } else {
+        setLoading(true);
+        // Supabase recommends keeping auth callbacks lightweight. Defer the
+        // membership query so a returning user is routed to their existing space.
+        setTimeout(() => {
+          loadCouple(next.user.id)
+            .then(setCouple)
+            .catch(() => setCouple(null))
+            .finally(() => setLoading(false));
+        }, 0);
+      }
     });
     return () => listener.subscription.unsubscribe();
   }, []);
@@ -33,11 +45,13 @@ export default function AuthPortal({ children }) {
     mode: 'live',
     session,
     couple,
+    displayName: couple.members?.find((member) => member.user_id === session.user.id)?.display_name || session.user.user_metadata?.display_name || session.user.email?.split('@')[0] || 'You',
     signOut: () => supabase.auth.signOut(),
     copyInvite: async () => {
       await navigator.clipboard.writeText(couple.invite_code);
       setMessage('Invite code copied.');
     },
+    refresh: refreshCouple,
   });
 }
 
