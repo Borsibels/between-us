@@ -163,7 +163,7 @@ function App({ backend }) {
 
       {mobileOpen && <nav className="mobile-menu">{['Home', 'Memories', 'Date ideas'].map((item) => <button key={item} onClick={() => navigate(item)}>{item}<ChevronRight size={17} /></button>)}<button onClick={() => { setMobileOpen(false); setSettingsOpen(true); }}>Settings<Settings size={17} /></button></nav>}
 
-      <main>
+      <main key={page} className="page-enter">
         {page === 'Home' && <HomePage displayName={backend.displayName || 'You'} currentMember={currentMember} partner={partner} couple={backend.couple} countdown={countdown} daily={daily} memories={liveMemories} dataLoading={dataLoading} answer={answer} setAnswer={setAnswer} answered={answered} bothAnswered={bothAnswered} submitAnswer={submitAnswer} navigate={navigate} setToast={setToast} openSettings={() => setSettingsOpen(true)} />}
         {page === 'Memories' && <MemoriesPage backend={backend} memories={liveMemories} reload={reloadContent} setToast={setToast} />}
         {page === 'Date ideas' && <DateIdeasPage backend={backend} plans={datePlans} reload={reloadContent} ideaIndex={ideaIndex} setIdeaIndex={setIdeaIndex} setToast={setToast} />}
